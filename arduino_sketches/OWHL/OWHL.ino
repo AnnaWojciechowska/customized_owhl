@@ -126,7 +126,7 @@
 const byte chipSelect = 10; // define the Chip Select pin for SD card
 // Declare initial name for output files written to SD card
 // The newer versions of SdFat library support long filenames
-char filename[] = "YYYYMMDD_HHMM_00.CSV";
+char filename[] = "YYYY_MM_DD-HH_MM_00.CSV";
 // Define name of settings file that may appear on SD card
 char setfilename[] = "settings.txt";  
 // Define an array to hold the 17-digit serial number that may be in eeprom
@@ -867,7 +867,7 @@ void writeToSD (void) {
 // The character array 'filename' was defined as a 20-character global array 
 // at the top of the sketch.
 void initFileName(DateTime time1) {
-	char buf[5];
+  char buf[5];
 	// integer to ascii function itoa(), supplied with numeric year value,
 	// a buffer to hold output, and the base for the conversion (base 10 here)
 	itoa(time1.year(), buf, 10);
@@ -875,55 +875,58 @@ void initFileName(DateTime time1) {
 	for (byte i = 0; i <= 4; i++){
 		filename[i] = buf[i];
 	}
+  filename[4] = '_';
+ 
 	// Insert the month value
 	if (time1.month() < 10) {
-		filename[4] = '0';
-		filename[5] = time1.month() + '0';
+		filename[5] = '0';
+		filename[6] = time1.month() + '0';
 	} else if (time1.month() >= 10) {
-		filename[4] = (time1.month() / 10) + '0';
-		filename[5] = (time1.month() % 10) + '0';
+		filename[5] = (time1.month() / 10) + '0';
+		filename[6] = (time1.month() % 10) + '0';
 	}
+  filename[7] = '_';
 	// Insert the day value
 	if (time1.day() < 10) {
-		filename[6] = '0';
-		filename[7] = time1.day() + '0';
+		filename[8] = '0';
+		filename[9] = time1.day() + '0';
 	} else if (time1.day() >= 10) {
-		filename[6] = (time1.day() / 10) + '0';
-		filename[7] = (time1.day() % 10) + '0';
+		filename[8] = (time1.day() / 10) + '0';
+		filename[9] = (time1.day() % 10) + '0';
 	}
-	// Insert an underscore between date and time
-	filename[8] = '_';
+  // Insert an underscore between date and time
+	filename[10] = '-';
 	// Insert the hour
 	if (time1.hour() < 10) {
-		filename[9] = '0';
-		filename[10] = time1.hour() + '0';
+		filename[11] = '0';
+		filename[12] = time1.hour() + '0';
 	} else if (time1.hour() >= 10) {
-		filename[9] = (time1.hour() / 10) + '0';
-		filename[10] = (time1.hour() % 10) + '0';
+		filename[11] = (time1.hour() / 10) + '0';
+		filename[12] = (time1.hour() % 10) + '0';
 	}
+  filename[13] = '_';
 	// Insert minutes
 		if (time1.minute() < 10) {
-		filename[11] = '0';
-		filename[12] = time1.minute() + '0';
+		filename[14] = '0';
+		filename[15] = time1.minute() + '0';
 	} else if (time1.minute() >= 10) {
-		filename[11] = (time1.minute() / 10) + '0';
-		filename[12] = (time1.minute() % 10) + '0';
+		filename[14] = (time1.minute() / 10) + '0';
+		filename[15] = (time1.minute() % 10) + '0';
 	}
 	// Insert another underscore after time
-	filename[13] = '_';
-		
+	filename[16] = '_';
 	// Next change the counter on the end of the filename
 	// (digits 14+15) to increment count for files generated on
 	// the same day. This shouldn't come into play
 	// during a normal data run, but can be useful when 
 	// troubleshooting.
 	for (uint8_t i = 0; i < 100; i++) {
-		filename[14] = i / 10 + '0';
-		filename[15] = i % 10 + '0';
-		filename[16] = '.';
-		filename[17] = 'c';
-		filename[18] = 's';
-		filename[19] = 'v';
+		filename[17] = i / 10 + '0';
+		filename[18] = i % 10 + '0';
+		filename[19] = '.';
+		filename[20] = 'c';
+		filename[21] = 's';
+		filename[22] = 'v';
 		
 		digitalWrite(ERRLED, LOW); // shut off error LED if it was previously on
 		
@@ -942,8 +945,9 @@ void initFileName(DateTime time1) {
 			// is finally false (i.e. you found a new file name to use).
 		} // end of if(!sd.exists())
 	} // end of file-naming for loop
-	
-	// Serial.println(filename);
+
+	Serial.println("Writing to filename");
+	Serial.println(filename);
 	
 	// Write 1st header line to SD file based on mission info
 	if (serialValid) {
